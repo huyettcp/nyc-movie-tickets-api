@@ -3,3 +3,4 @@ flask-cors
 selenium
 beautifulsoup4
 gunicorn
+chromedriver-autoinstaller

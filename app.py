@@ -1,5 +1,6 @@
+
 import logging
-import os  # Added for dynamic port handling
+import os
 from threading import Thread
 from flask import Flask, jsonify
 from flask_cors import CORS
@@ -10,6 +11,7 @@ import hashlib
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
+import chromedriver_autoinstaller
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -37,6 +39,8 @@ def generate_showtime_id(theater, movie, date, time):
 
 def scrape_nyc_movie_showtimes():
     logger.info("Selenium scraper started...")
+
+    chromedriver_autoinstaller.install()  # Auto-install Chromedriver
 
     chrome_options = Options()
     chrome_options.add_argument("--headless")
@@ -91,7 +95,6 @@ def scrape_nyc_movie_showtimes():
                     format_sections = movie.find_all('section', class_=lambda x: x and 'showtime-options' in x)
 
                     for variant in format_sections:
-                        # Handle nested Amenity Groups properly
                         amenity_groups = variant.find_all('section', class_=lambda x: x and 'AmenityGroup' in x)
                         for group in amenity_groups:
                             format_tag = variant.find('div', class_=lambda x: x and 'DivVariantTitle' in x)
