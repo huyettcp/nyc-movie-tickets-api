@@ -9,9 +9,7 @@ import json
 import hashlib
 
 from bs4 import BeautifulSoup
-from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
-import chromedriver_autoinstaller
+import undetected_chromedriver as uc
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -40,14 +38,12 @@ def generate_showtime_id(theater, movie, date, time):
 def scrape_nyc_movie_showtimes():
     logger.info("Selenium scraper started...")
 
-    chromedriver_autoinstaller.install()  # Auto-install Chromedriver
+    options = uc.ChromeOptions()
+    options.add_argument("--headless")
+    options.add_argument("--no-sandbox")
+    options.add_argument("--disable-dev-shm-usage")
 
-    chrome_options = Options()
-    chrome_options.add_argument("--headless")
-    chrome_options.add_argument("--no-sandbox")
-    chrome_options.add_argument("--disable-dev-shm-usage")
-
-    driver = webdriver.Chrome(options=chrome_options)
+    driver = uc.Chrome(options=options)
     all_showings = []
     theater_details = []
 
