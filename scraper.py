@@ -39,6 +39,17 @@ def generate_showtime_id(theater, movie, date, time):
     raw = f"{theater}-{movie}-{date}-{time}"
     return hashlib.md5(raw.encode()).hexdigest()
 
+def safe_get(driver, url, retries=2):
+    for attempt in range(retries):
+        try:
+            driver.get(url)
+            time.sleep(1.5)
+            return True
+        except Exception as e:
+            logger.warning(f"Error loading {url} (attempt {attempt + 1}): {e}")
+            time.sleep(2)
+    return False
+
 def scrape_nyc_movie_showtimes():
     logger.info("Selenium scraper started...")
     all_showings = []
@@ -56,28 +67,26 @@ def scrape_nyc_movie_showtimes():
         try:
             theater_name = theater["name"]
             base_url = theater["url"]
+            addr_url = f"{base_url}?date={datetime.today().strftime('%Y-%m-%d')}"
+            if safe_get(driver, addr_url):
+                soup = BeautifulSoup(driver.page_source, 'html.parser')
+                address_tag = soup.find('span', attrs={'data-qa': 'address'})
+                address = address_tag.text.strip().replace("\n", " ") if address_tag else ""
+                theater_details.append({"name": theater_name, "address": address})
 
-            # Grab address on first load
-            driver.get(f"{base_url}?date={datetime.today().strftime('%Y-%m-%d')}")
-            time.sleep(1.5)
-            soup = BeautifulSoup(driver.page_source, 'html.parser')
-            address_tag = soup.find('span', attrs={'data-qa': 'address'})
-            address = address_tag.text.strip().replace("\n", " ") if address_tag else ""
-            theater_details.append({"name": theater_name, "address": address})
-
-            for i in range(4):  # Only 4 days
+            for i in range(4):
                 date_obj = datetime.today() + timedelta(days=i)
                 date_str = date_obj.strftime('%Y-%m-%d')
                 url = f"{base_url}?date={date_str}"
                 logger.info(f"Loading {url}")
 
+                if not safe_get(driver, url):
+                    continue
+
                 try:
-                    driver.get(url)
-                    time.sleep(1.5)
                     WebDriverWait(driver, 10).until(
                         EC.presence_of_element_located((By.CSS_SELECTOR, 'li[data-qa="movie"]'))
                     )
-
                     soup = BeautifulSoup(driver.page_source, 'html.parser')
                     movie_blocks = soup.find_all('li', attrs={'data-qa': 'movie'})
                     logger.info(f"{date_str}: Found {len(movie_blocks)} movies at {theater_name}")
@@ -134,10 +143,8 @@ def scrape_nyc_movie_showtimes():
                                         "time": time_text,
                                         "url": full_url
                                     })
-
                 except Exception as e:
-                    logger.warning(f"Error loading {url}: {e}")
-                    continue
+                    logger.warning(f"Error parsing showtimes at {url}: {e}")
 
         finally:
             logger.info(f"Closing Chrome for theater: {theater['name']}")
