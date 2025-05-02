@@ -20,11 +20,20 @@ logger = logging.getLogger(__name__)
 theaters = [
     {"name": "AMC Lincoln Square 13", "url": "https://www.movietickets.com/theater/amc-lincoln-square-13/dQ9fepfmriLGtzO"},
     {"name": "Regal Union Square ScreenX and 4DX", "url": "https://www.movietickets.com/theater/regal-union-square-screenx-and-4dx/Lrbfx2flzcP4SYq"},
-    {"name": "Regal Times Square", "url": "https://www.movietickets.com/theater/regal-times-square/1K4fe6fx8fpnhxp"}
+    {"name": "Regal Times Square", "url": "https://www.movietickets.com/theater/regal-times-square/1K4fe6fx8fpnhxp"},
+    {"name": "Angelika Film Center and Cafe", "url": "https://www.movietickets.com/theater/angelika-film-center-and-cafe/Al2f6XiGOIkVTp4"},
+    {"name": "Village East by Angelika", "url": "https://www.movietickets.com/theater/village-east-by-angelika/JB2fqyfvMI4ohVr"},
+    {"name": "Cinema 123 by Angelika", "url": "https://www.movietickets.com/theater/cinema-123-by-angelika/bJ9faWflvIMBTBv"},
+    {"name": "AMC Empire 25", "url": "https://www.movietickets.com/theater/amc-empire-25/r89fOVfArhGZSdq"},
+    {"name": "AMC Village 7", "url": "https://www.movietickets.com/theater/amc-village-7/WYXf89SDyiGAs9P"},
+    {"name": "Regal Battery Park", "url": "https://www.movietickets.com/theater/regal-battery-park/PDkfL2fMpFWQfkV"}
 ]
 
-premium_formats = ['IMAX', 'IMAX 70MM', 'IMAX with Laser', 'IMAX with Laser 3D', 'RPX', '4DX', 'ScreenX', 
-                   'RealD 3D', 'Dolby Cinema @ AMC', 'Laser at AMC', 'Digital 3D']
+premium_formats = [
+    'IMAX', 'IMAX 70MM', 'IMAX with Laser', 'IMAX with Laser 3D',
+    'RPX', '4DX', 'ScreenX', 'RealD 3D', 'Dolby Cinema @ AMC',
+    'Laser at AMC', 'Digital 3D', '70MM Film'
+]
 
 def generate_showtime_id(theater, movie, date, time):
     raw = f"{theater}-{movie}-{date}-{time}"
